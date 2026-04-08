@@ -166,6 +166,46 @@ body {
     }
 }
 
+/* 说话动画 - 小卡拉播放时 */
+.speaking {
+    animation: speakingBounce 0.5s ease-in-out infinite;
+}
+
+@keyframes speakingBounce {
+    0%, 100% {
+        transform: translateY(0) scale(1);
+    }
+    25% {
+        transform: translateY(-8px) scale(1.02);
+    }
+    50% {
+        transform: translateY(-3px) scale(1);
+    }
+    75% {
+        transform: translateY(-10px) scale(1.03);
+    }
+}
+
+/* 故事朗读时的特殊动画 */
+.story-speaking {
+    animation: storySpeaking 0.6s ease-in-out infinite;
+}
+
+@keyframes storySpeaking {
+    0%, 100% {
+        transform: translateY(0) rotate(0deg);
+    }
+    25% {
+        transform: translateY(-5px) rotate(-2deg);
+    }
+    50% {
+        transform: translateY(-10px) rotate(0deg);
+    }
+    75% {
+        transform: translateY(-5px) rotate(2deg);
+    }
+}
+
 .app-title {
     font-size: 2.2rem;
     font-weight: 700;
@@ -320,6 +360,7 @@ body {
 
 .btn-audio.playing {
     animation: audioPulse 0.5s ease infinite;
+    background: linear-gradient(135deg, var(--secondary-dark) 0%, var(--secondary) 100%);
 }
 
 @keyframes audioPulse {
@@ -328,6 +369,36 @@ body {
     }
     50% {
         transform: scale(1.05);
+    }
+}
+
+/* 故事朗读按钮 */
+.btn-story {
+    background: linear-gradient(135deg, var(--warning) 0%, #F9A825 100%);
+    color: white;
+    padding: 12px 24px;
+    font-size: 1rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-story:hover:not(:disabled) {
+    background: linear-gradient(135deg, #FFE082 0%, var(--warning) 100%);
+    transform: translateY(-2px);
+}
+
+.btn-story.playing {
+    animation: storyBtnPulse 0.8s ease infinite;
+    background: linear-gradient(135deg, #F9A825 0%, var(--warning) 100%);
+}
+
+@keyframes storyBtnPulse {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: var(--shadow-sm);
+    }
+    50% {
+        transform: scale(1.03);
+        box-shadow: 0 0 15px rgba(253, 203, 110, 0.6);
     }
 }
 
@@ -447,8 +518,15 @@ body {
 .story-header {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 8px;
     margin-bottom: 12px;
+}
+
+.story-header-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .story-icon {
@@ -459,6 +537,27 @@ body {
     font-size: 1.1rem;
     font-weight: 600;
     color: var(--primary);
+}
+
+/* 听故事按钮 */
+.btn-story-listen {
+    background: linear-gradient(135deg, var(--warning) 0%, #FFB300 100%);
+    color: white;
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-sm);
+    white-space: nowrap;
+}
+
+.btn-story-listen:hover:not(:disabled) {
+    background: linear-gradient(135deg, #FFE082 0%, var(--warning) 100%);
+    transform: translateY(-1px);
+}
+
+.btn-story-listen.playing {
+    animation: storyBtnPulse 0.8s ease infinite;
+    background: linear-gradient(135deg, #FF8F00 0%, var(--warning) 100%);
 }
 
 .story-content {
@@ -743,8 +842,14 @@ body {
     }
     
     .btn-audio,
-    .btn-record {
+    .btn-record,
+    .btn-story {
         width: 100%;
+    }
+    
+    .btn-story-listen {
+        padding: 6px 12px;
+        font-size: 0.85rem;
     }
     
     .complete-stats {
@@ -811,7 +916,7 @@ body::before {
         <div id="home-page" class="page active">
             <div class="home-content">
                 <div class="character-container">
-                    <img src="./images/小卡拉_开心打招呼.jpg" alt="小卡拉" class="character-img pulse" id="home-character">
+                    <img src="../角色设计/小卡拉_开心打招呼.jpg" alt="小卡拉" class="character-img pulse" id="home-character">
                 </div>
                 <h1 class="app-title">小卡拉趣味记单词</h1>
                 <p class="app-slogan">卡拉卡拉，故事来啦！</p>
@@ -846,7 +951,7 @@ body::before {
             
             <div class="learn-content">
                 <div class="character-container learn-character">
-                    <img src="./images/小卡拉_认真思考.jpg" alt="小卡拉" class="character-img" id="learn-character">
+                    <img src="../角色设计/小卡拉_认真思考.jpg" alt="小卡拉" class="character-img" id="learn-character">
                 </div>
                 
                 <div class="word-card">
@@ -856,8 +961,14 @@ body::before {
                 
                 <div class="story-box">
                     <div class="story-header">
-                        <span class="story-icon">📖</span>
-                        <span class="story-title">卡拉的故事</span>
+                        <div class="story-header-left">
+                            <span class="story-icon">📖</span>
+                            <span class="story-title">卡拉的故事</span>
+                        </div>
+                        <button class="btn btn-story-listen" id="story-btn">
+                            <span class="btn-icon" id="story-btn-icon">🔊</span>
+                            <span id="story-btn-text">听故事</span>
+                        </button>
                     </div>
                     <div class="story-content" id="story-content">
                         小卡拉今天在果园里看到一颗红红的苹果树...
@@ -867,7 +978,7 @@ body::before {
                 <div class="action-buttons">
                     <button class="btn btn-audio" id="play-sound-btn">
                         <span class="btn-icon">🔊</span>
-                        听发音
+                        <span>听发音</span>
                     </button>
                     <button class="btn btn-record" id="record-btn">
                         <span class="btn-icon" id="record-icon">🎤</span>
@@ -895,7 +1006,7 @@ body::before {
             
             <div class="learn-content">
                 <div class="character-container learn-character">
-                    <img src="./images/小卡拉_调皮鬼脸.jpg" alt="小卡拉" class="character-img" id="review-character">
+                    <img src="../角色设计/小卡拉_调皮鬼脸.jpg" alt="小卡拉" class="character-img" id="review-character">
                 </div>
                 
                 <div class="word-card review-card">
@@ -903,10 +1014,26 @@ body::before {
                     <div class="word-chinese" id="review-word-chinese">苹果</div>
                 </div>
                 
+                <div class="story-box">
+                    <div class="story-header">
+                        <div class="story-header-left">
+                            <span class="story-icon">📖</span>
+                            <span class="story-title">卡拉的故事</span>
+                        </div>
+                        <button class="btn btn-story-listen" id="review-story-btn">
+                            <span class="btn-icon" id="review-story-btn-icon">🔊</span>
+                            <span id="review-story-btn-text">听故事</span>
+                        </button>
+                    </div>
+                    <div class="story-content" id="review-story-content">
+                        小卡拉今天学了一个新单词，他觉得好有趣！
+                    </div>
+                </div>
+                
                 <div class="action-buttons">
                     <button class="btn btn-audio" id="review-play-btn">
                         <span class="btn-icon">🔊</span>
-                        听发音
+                        <span>听发音</span>
                     </button>
                     <button class="btn btn-record" id="review-record-btn">
                         <span class="btn-icon" id="review-record-icon">🎤</span>
@@ -924,7 +1051,7 @@ body::before {
         <div id="complete-page" class="page">
             <div class="complete-content">
                 <div class="character-container">
-                    <img src="./images/小卡拉_得意欢呼.jpg" alt="小卡拉" class="character-img bounce" id="complete-character">
+                    <img src="../角色设计/小卡拉_得意欢呼.jpg" alt="小卡拉" class="character-img bounce" id="complete-character">
                 </div>
                 <h1 class="complete-title">太棒啦！🎉</h1>
                 <p class="complete-message" id="complete-message">你已经完成了本次学习！</p>
@@ -997,9 +1124,22 @@ const WORD_DATA = {
             {"word": "letter", "translation": "字母", "part_of_speech": "名词"},
             {"word": "number", "translation": "数字", "part_of_speech": "名词"},
             {"word": "fun", "translation": "有趣的", "part_of_speech": "形容词"},
+            {"word": "school", "translation": "学校", "part_of_speech": "名词"},
+            {"word": "book", "translation": "书", "part_of_speech": "名词"},
+            {"word": "bag", "translation": "书包", "part_of_speech": "名词"},
+            {"word": "pen", "translation": "钢笔", "part_of_speech": "名词"},
+            {"word": "pencil", "translation": "铅笔", "part_of_speech": "名词"},
+            {"word": "ruler", "translation": "尺子", "part_of_speech": "名词"},
+            {"word": "eraser", "translation": "橡皮", "part_of_speech": "名词"},
+            {"word": "crayon", "translation": "蜡笔", "part_of_speech": "名词"},
+            {"word": "say", "translation": "说", "part_of_speech": "动词"},
+            {"word": "sing", "translation": "唱歌", "part_of_speech": "动词"},
+            {"word": "dance", "translation": "跳舞", "part_of_speech": "动词"},
+            {"word": "read", "translation": "阅读", "part_of_speech": "动词"},
+            {"word": "write", "translation": "写字", "part_of_speech": "动词"},
+            {"word": "draw", "translation": "画", "part_of_speech": "动词"},
             {"word": "count", "translation": "数数", "part_of_speech": "动词"},
             {"word": "find", "translation": "找到", "part_of_speech": "动词"},
-            {"word": "draw", "translation": "画", "part_of_speech": "动词"},
             {"word": "share", "translation": "分享", "part_of_speech": "动词"}
           ]
         },
@@ -1272,7 +1412,8 @@ const state = {
     isRecording: false,
     sessionCorrect: 0,
     totalLearned: 0,
-    isReviewMode: false
+    isReviewMode: false,
+    isSpeaking: false  // 新增：用于跟踪是否正在播放语音
 };
 
 // 故事库
@@ -1302,10 +1443,10 @@ const STORIES = {
 
 // 角色图片映射
 const CHARACTERS = {
-    greeting: './images/小卡拉_开心打招呼.jpg',
-    think: './images/小卡拉_认真思考.jpg',
-    happy: './images/小卡拉_得意欢呼.jpg',
-    funny: './images/小卡拉_调皮鬼脸.jpg'
+    greeting: '../角色设计/小卡拉_开心打招呼.jpg',
+    think: '../角色设计/小卡拉_认真思考.jpg',
+    happy: '../角色设计/小卡拉_得意欢呼.jpg',
+    funny: '../角色设计/小卡拉_调皮鬼脸.jpg'
 };
 
 // 默认单词
@@ -1372,14 +1513,50 @@ function saveLearnedWord(word) {
     }
 }
 
-// TTS - 使用Web Speech API
+// 小卡拉动画控制 - 添加speaking类
+function startSpeaking(charImg) {
+    if (charImg) {
+        charImg.classList.add('speaking');
+        state.isSpeaking = true;
+    }
+}
+
+// 小卡拉动画控制 - 移除speaking类
+function stopSpeaking(charImg) {
+    if (charImg) {
+        charImg.classList.remove('speaking');
+        state.isSpeaking = false;
+    }
+}
+
+// TTS - 使用Web Speech API（优化版：提高速度）
 function playTTS(text, lang = 'en-US') {
     return new Promise((resolve) => {
         if ('speechSynthesis' in window) {
             speechSynthesis.cancel();
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = lang;
-            utterance.rate = lang === 'en-US' ? 0.85 : 0.9;
+            // 优化：英文从0.85提高到1.0，中文从0.9提高到1.0
+            utterance.rate = lang === 'en-US' ? 1.0 : 1.0;
+            utterance.pitch = 1.1;  // 稍微提高音调，更适合儿童
+            utterance.onend = () => resolve(true);
+            utterance.onerror = () => resolve(false);
+            speechSynthesis.speak(utterance);
+        } else {
+            resolve(false);
+        }
+    });
+}
+
+// 播放故事TTS
+function playStoryTTS(storyText) {
+    return new Promise((resolve) => {
+        if ('speechSynthesis' in window) {
+            speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(storyText);
+            utterance.lang = 'zh-CN';
+            utterance.rate = 1.0;  // 故事中文朗读速度
+            utterance.pitch = 1.1;
             utterance.onend = () => resolve(true);
             utterance.onerror = () => resolve(false);
             speechSynthesis.speak(utterance);
@@ -1530,6 +1707,17 @@ function updateLearnUI() {
     document.getElementById('progress-label').textContent = `${state.currentIndex+1}/${state.currentWords.length}`;
     document.getElementById('feedback-area').innerHTML = '';
     document.getElementById('learn-character').src = CHARACTERS.think;
+    
+    // 重置听故事按钮状态
+    const storyBtn = document.getElementById('story-btn');
+    const storyBtnText = document.getElementById('story-btn-text');
+    const storyBtnIcon = document.getElementById('story-btn-icon');
+    storyBtn.classList.remove('playing');
+    storyBtnText.textContent = '听故事';
+    storyBtnIcon.textContent = '🔊';
+    
+    // 移除角色动画
+    stopSpeaking(document.getElementById('learn-character'));
 }
 
 function updateReviewUI() {
@@ -1537,10 +1725,22 @@ function updateReviewUI() {
     const w = state.reviewWords[state.reviewIndex];
     document.getElementById('review-word-english').textContent = w.word;
     document.getElementById('review-word-chinese').textContent = w.translation;
+    document.getElementById('review-story-content').textContent = getStory(w.word);
     document.getElementById('review-progress-fill').style.width = `${((state.reviewIndex+1)/state.reviewWords.length)*100}%`;
     document.getElementById('review-progress-label').textContent = `${state.reviewIndex+1}/${state.reviewWords.length}`;
     document.getElementById('review-feedback-area').innerHTML = '';
     document.getElementById('review-character').src = CHARACTERS.funny;
+    
+    // 重置听故事按钮状态
+    const storyBtn = document.getElementById('review-story-btn');
+    const storyBtnText = document.getElementById('review-story-btn-text');
+    const storyBtnIcon = document.getElementById('review-story-btn-icon');
+    storyBtn.classList.remove('playing');
+    storyBtnText.textContent = '听故事';
+    storyBtnIcon.textContent = '🔊';
+    
+    // 移除角色动画
+    stopSpeaking(document.getElementById('review-character'));
 }
 
 function nextWord() { state.currentIndex++; updateLearnUI(); }
@@ -1568,13 +1768,66 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('continue-btn').onclick = startLearning;
     document.getElementById('home-btn').onclick = () => switchPage('home-page');
     
-    // 学习页-播放
+    // 学习页-播放发音（优化：立即播放，无延迟）
     document.getElementById('play-sound-btn').onclick = async function() {
-        this.classList.add('playing');
+        if (state.isSpeaking) return;  // 防止重复点击
+        
+        const btn = this;
+        const btnText = btn.querySelector('span:last-child');
+        const btnIcon = btn.querySelector('.btn-icon');
+        const charImg = document.getElementById('learn-character');
         const w = state.currentWords[state.currentIndex];
+        
+        // 立即开始，无需loading
+        btn.classList.add('playing');
+        btnText.textContent = '播放中...';
+        btnIcon.textContent = '🔊';
+        
+        // 启动小卡拉动画
+        startSpeaking(charImg);
+        
+        // 立即播放英文发音
         await playTTS(w.word);
-        setTimeout(() => playTTS(w.translation, 'zh-CN'), 1000);
-        setTimeout(() => this.classList.remove('playing'), 2500);
+        
+        // 等待一小段时间后播放中文翻译（减少等待时间）
+        setTimeout(async () => {
+            await playTTS(w.translation, 'zh-CN');
+            
+            // 播放完成，停止动画
+            stopSpeaking(charImg);
+            btn.classList.remove('playing');
+            btnText.textContent = '听发音';
+            btnIcon.textContent = '🔊';
+        }, 600);
+    };
+    
+    // 学习页-听故事（新增功能）
+    document.getElementById('story-btn').onclick = async function() {
+        if (state.isSpeaking) return;  // 防止重复点击
+        
+        const btn = this;
+        const btnText = document.getElementById('story-btn-text');
+        const btnIcon = document.getElementById('story-btn-icon');
+        const charImg = document.getElementById('learn-character');
+        const w = state.currentWords[state.currentIndex];
+        const storyText = getStory(w.word);
+        
+        // 更新按钮状态
+        btn.classList.add('playing');
+        btnText.textContent = '播放中...';
+        btnIcon.textContent = '📖';
+        
+        // 启动小卡拉动画（故事模式）
+        startSpeaking(charImg);
+        
+        // 播放故事
+        await playStoryTTS(storyText);
+        
+        // 播放完成，停止动画
+        stopSpeaking(charImg);
+        btn.classList.remove('playing');
+        btnText.textContent = '听故事';
+        btnIcon.textContent = '🔊';
     };
     
     // 学习页-录音
@@ -1584,13 +1837,66 @@ document.addEventListener('DOMContentLoaded', async () => {
         state.isRecording ? stopRecording(this, text, icon) : startRecording(this, text, icon);
     };
     
-    // 复习页-播放
+    // 复习页-播放发音（优化：立即播放，无延迟）
     document.getElementById('review-play-btn').onclick = async function() {
-        this.classList.add('playing');
+        if (state.isSpeaking) return;  // 防止重复点击
+        
+        const btn = this;
+        const btnText = btn.querySelector('span:last-child');
+        const btnIcon = btn.querySelector('.btn-icon');
+        const charImg = document.getElementById('review-character');
         const w = state.reviewWords[state.reviewIndex];
+        
+        // 立即开始，无需loading
+        btn.classList.add('playing');
+        btnText.textContent = '播放中...';
+        btnIcon.textContent = '🔊';
+        
+        // 启动小卡拉动画
+        startSpeaking(charImg);
+        
+        // 立即播放英文发音
         await playTTS(w.word);
-        setTimeout(() => playTTS(w.translation, 'zh-CN'), 1000);
-        setTimeout(() => this.classList.remove('playing'), 2500);
+        
+        // 等待一小段时间后播放中文翻译
+        setTimeout(async () => {
+            await playTTS(w.translation, 'zh-CN');
+            
+            // 播放完成，停止动画
+            stopSpeaking(charImg);
+            btn.classList.remove('playing');
+            btnText.textContent = '听发音';
+            btnIcon.textContent = '🔊';
+        }, 600);
+    };
+    
+    // 复习页-听故事（新增功能）
+    document.getElementById('review-story-btn').onclick = async function() {
+        if (state.isSpeaking) return;  // 防止重复点击
+        
+        const btn = this;
+        const btnText = document.getElementById('review-story-btn-text');
+        const btnIcon = document.getElementById('review-story-btn-icon');
+        const charImg = document.getElementById('review-character');
+        const w = state.reviewWords[state.reviewIndex];
+        const storyText = getStory(w.word);
+        
+        // 更新按钮状态
+        btn.classList.add('playing');
+        btnText.textContent = '播放中...';
+        btnIcon.textContent = '📖';
+        
+        // 启动小卡拉动画
+        startSpeaking(charImg);
+        
+        // 播放故事
+        await playStoryTTS(storyText);
+        
+        // 播放完成，停止动画
+        stopSpeaking(charImg);
+        btn.classList.remove('playing');
+        btnText.textContent = '听故事';
+        btnIcon.textContent = '🔊';
     };
     
     // 复习页-录音
